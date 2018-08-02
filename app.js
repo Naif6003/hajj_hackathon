@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+ 
+var mongoose = require('mongoose');
+var hajar = require('./db.js');
+mongoose.connect('mongodb://localhost:27017/hjj_hackathon');
+
 'use strict';
 
 var express = require('express'); // app server
@@ -48,7 +53,7 @@ if (process.env.ASSISTANT_IAM_APIKEY && process.env.ASSISTANT_IAM_APIKEY != '') 
 
 // Endpoint to be call from the client side
 app.post('/api/message', function (req, res) {
-  var workspace = process.env.WORKSPACE_ID || '922db230-0283-4e14-9c81-77ee499eccc9';
+  var workspace = process.env.WORKSPACE_ID || 'b701ff58-0468-4750-bdd9-5a1bcd180b5b';
   if (!workspace || workspace === '') {
     return res.json({
       'output': {
@@ -81,7 +86,13 @@ function updateMessage(input, response) {
   var responseText = null;
   if (!response.output) {
     response.output = {};
-  } else {
+  } else { 
+    // no response.
+    var new_hajar = new hajar({ conversation_id: response.context.conversation_id, text: response.input.text});
+    new_hajar.save(function(err){ if(err) console.log(err); return "Saved Successfully."});
+    console.log(JSON.stringify(response.input.text))
+    console.log(JSON.stringify(response.context.conversation_id))
+    
     return response;
   }
   if (response.intents && response.intents[0]) {
